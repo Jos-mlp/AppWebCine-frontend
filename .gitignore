@@ -24,5 +24,5 @@ dist-ssr
 *.sw?
 
 # Ignorar archivos CSS y sus mapas generados por SCSS
-*.css
-*.css.map
+#*.css
+#*.css.map
