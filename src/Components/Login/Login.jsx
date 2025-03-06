@@ -6,7 +6,7 @@ import {Link} from 'react-router-dom'
 
 //importar assets
 import video from '../../assets/LoginAssets/24496-344562743_tiny.mp4'
-import Logo from '../../assets/LoginAssets/logo-fibonaccy-blanco.jpg'
+import Logo from '../../assets/LoginAssets/logo1.jpg'
 
 //importar Icons
 import {FaUserShield} from 'react-icons/fa'
