@@ -1,4 +1,5 @@
 import './App.css'
+import './Components/Login/Login.css'
 //importamos componentes
 import Dashboard from './Components/Dashboard/Dashboard'
 import Login from './Components/Login/Login'
