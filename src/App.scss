@@ -186,6 +186,29 @@ img,video{
 
         .formDiv{
             flex-basis: 50%;
+            margin: auto;
+            flex-direction: column ;
+            gap: 1.5rem;
+            transform: translateY(-1rem);
+
+            .headerDiv{
+                text-align: center;
+                padding: 1.5rem 0;
+
+                img{
+                    width: 60px;
+                    padding-bottom: .5rem;
+                }
+
+                h3{
+                    font-size: 25px;
+                    color: var(--blackColor);
+                    font-weight: 600;
+                }
+
+            }
+
+
             
         }
     }
