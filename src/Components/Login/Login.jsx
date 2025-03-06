@@ -1,5 +1,7 @@
 import React from 'react'
 import './Login.css'
+import '../../App.css'
+
 import {Link} from 'react-router-dom'
 
 //importar assets

@@ -85,4 +85,21 @@ img, video {
 .btn:hover {
   color: var(--primaryColor);
   background: var(--paleGreen);
+}
+
+.loginPage {
+  height: 100vh;
+  width: 100%;
+  margin: auto;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 7px 50px rgb(214, 223, 213);
+}
+.loginPage .container {
+  height: 75vh;
+  width: 620%;
+  margin: auto;
+  justify-content: space-between;
+  border-radius: 10px;
+  background: hsl(0, 89%, 49%);
 }/*# sourceMappingURL=App.css.map */
