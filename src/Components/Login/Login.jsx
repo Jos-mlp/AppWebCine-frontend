@@ -38,7 +38,9 @@ const Login = () => {
           </div>
 
           <form action="" className="form grid">
-            <span>Estado del Login</span>
+            <span className='showMessage'>
+              Estado del Login
+            </span>
             <div className="inputDiv">
               <label htmlFor="username">Username</label>
               <div className="input flex">
