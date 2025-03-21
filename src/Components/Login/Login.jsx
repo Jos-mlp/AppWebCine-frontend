@@ -6,7 +6,7 @@ import {Link} from 'react-router-dom'
 
 //importar assets
 import video from '../../assets/LoginAssets/24496-344562743_tiny.mp4'
-import Logo from '../../assets/LoginAssets/logo1.jpg'
+import Logo from '../../assets/LoginAssets/logo.png'
 
 //importar Icons
 import {FaUserShield} from 'react-icons/fa'
@@ -21,8 +21,8 @@ const Login = () => {
         <div className="videoDiv">
           <video src={video} autoPlay muted loop></video>
           <div className="textDiv">
-            <h2 className="title">Create</h2>
-            <p>Sell</p>
+            <h2 className="title">Ingresa</h2>
+            <p>Descubre nuestras peliculas</p>
           </div>
           <div className="footerDiv flex">
             <span className="text">¿No tienes una cuenta?</span>
