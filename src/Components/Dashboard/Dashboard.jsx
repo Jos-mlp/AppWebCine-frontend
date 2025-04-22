@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import SeatSelector from '../SeatSelector/SeatSelector';
 import './Dashboard.css';
@@ -49,10 +50,19 @@ const MovieDetail = ({ movie, onBack, onReserve }) => (
 );
 
 const Dashboard = () => {
-  const [view, setView] = useState('list'); 
+  const navigate = useNavigate();
+  const [view, setView] = useState('list');
   const [movie, setMovie] = useState(null);
 
-  // Datos de ejemplo; en producción vendrían de un fetch/props
+  // Verificar token al montar para proteger la ruta
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/');
+    }
+  }, [navigate]);
+
+  // Datos de ejemplo; en producción vendrían de un fetch con token
   const movies = [
     {
       id: 1,
