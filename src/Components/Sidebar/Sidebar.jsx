@@ -6,18 +6,17 @@ const Sidebar = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Quitar token
-    navigate('/'); // Redirigir a login
+    localStorage.removeItem('token'); // Quita token
+    navigate('/'); // Redirige a login
   };
 
   return (
     <aside className="sidebar">
       <h2>Menú</h2>
       <nav>
-        <button>Dashboard</button>
-        <button>Películas</button>
-        <button>Reservas</button>
-        <button>Perfil</button>
+        <button onClick={() => navigate('/dashboard')}>Películas</button>
+        <button onClick={() => navigate('/reservas')}>Reservas</button>
+        <button onClick={() => navigate('/admin')}>Admin</button>
         <button onClick={handleLogout}>Cerrar sesión</button>
       </nav>
     </aside>

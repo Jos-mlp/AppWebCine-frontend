@@ -1,0 +1,132 @@
+/* ManageSalas.css */
+.manage-salas-container {
+  display: flex;
+}
+
+.manage-salas-main {
+  flex: 1;
+  padding: 20px;
+  background-color: #f9fafb;
+  min-height: 100vh;
+}
+
+.manage-salas-main h1 {
+  color: #1e3a8a;
+  margin-bottom: 20px;
+}
+
+.form-list-container {
+  display: flex;
+  gap: 40px;
+}
+
+/* Formulario de creación */
+.sala-form {
+  background-color: #ffffff;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sala-form h2 {
+  margin-bottom: 12px;
+  color: #1e40af;
+}
+
+.sala-form label {
+  margin-top: 8px;
+  color: #4b5563;
+}
+
+.sala-form input {
+  padding: 6px 8px;
+  margin-top: 4px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+}
+
+.sala-form button {
+  margin-top: 16px;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.sala-form button:hover {
+  background-color: #1e40af;
+}
+
+.sala-form .mensaje {
+  margin-top: 12px;
+  color: #dc2626;
+}
+
+/* Tabla de salas */
+.sala-list {
+  flex: 1;
+}
+
+.sala-list h2 {
+  color: #1e40af;
+  margin-bottom: 12px;
+}
+
+.sala-list table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+}
+
+.sala-list th,
+.sala-list td {
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.sala-list th {
+  background-color: #1e40af;
+  color: #ffffff;
+}
+
+/* Columnas de acciones (íconos) */
+.acciones-col {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.icon {
+  cursor: pointer;
+  font-size: 1rem;
+  color: #4b5563;
+  transition: color 0.2s ease;
+}
+
+.icon:hover {
+  color: #1e40af;
+}
+
+/* Íconos específicos */
+.edit-icon {
+  color: #2563eb;
+}
+
+.edit-icon:hover {
+  color: #1e40af;
+}
+
+.delete-icon {
+  color: #dc2626;
+}
+
+.delete-icon:hover {
+  color: #b91c1c;
+}

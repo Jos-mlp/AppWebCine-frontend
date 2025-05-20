@@ -1,0 +1,36 @@
+/* AdminDashboard.css */
+.admin-container {
+  display: flex;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 20px;
+  background-color: #f9fafb;
+  min-height: 100vh;
+}
+
+.admin-main h1 {
+  color: #1e3a8a;
+  margin-bottom: 20px;
+}
+
+.admin-buttons {
+  display: flex;
+  gap: 16px;
+}
+
+.admin-buttons button {
+  background-color: #1e40af;
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.admin-buttons button:hover {
+  background-color: #2563eb;
+}

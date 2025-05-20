@@ -1,0 +1,138 @@
+/* ManageFunciones.css */
+.manage-funciones-container {
+  display: flex;
+}
+
+.manage-funciones-main {
+  flex: 1;
+  padding: 20px;
+  background-color: #f9fafb;
+  min-height: 100vh;
+}
+
+.manage-funciones-main h1 {
+  color: #1e3a8a;
+  margin-bottom: 20px;
+}
+
+.funcion-form-list {
+  display: flex;
+  gap: 40px;
+}
+
+/* Formulario de función */
+.funcion-form {
+  background-color: #ffffff;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+}
+
+.funcion-form h2 {
+  margin-bottom: 12px;
+  color: #1e40af;
+}
+
+.funcion-form label {
+  margin-top: 8px;
+  color: #4b5563;
+}
+
+.funcion-form input,
+.funcion-form textarea,
+.funcion-form select {
+  margin-top: 4px;
+  padding: 6px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+}
+
+.funcion-form textarea {
+  resize: vertical;
+  height: 60px;
+}
+
+.funcion-form button {
+  margin-top: 16px;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.funcion-form button:hover {
+  background-color: #1e40af;
+}
+
+.funcion-form .mensaje {
+  margin-top: 12px;
+  color: #dc2626;
+}
+
+/* Tabla de funciones */
+.funcion-list {
+  flex: 1;
+}
+
+.funcion-list h2 {
+  color: #1e40af;
+  margin-bottom: 12px;
+}
+
+.funcion-list table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+}
+
+.funcion-list th,
+.funcion-list td {
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.funcion-list th {
+  background-color: #1e40af;
+  color: #ffffff;
+}
+
+/* Columnas de acciones (íconos) */
+.acciones-col {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.icon {
+  cursor: pointer;
+  font-size: 1rem;
+  color: #4b5563;
+  transition: color 0.2s ease;
+}
+
+.icon:hover {
+  color: #1e40af;
+}
+
+.edit-icon {
+  color: #2563eb;
+}
+
+.edit-icon:hover {
+  color: #1e40af;
+}
+
+.delete-icon {
+  color: #dc2626;
+}
+
+.delete-icon:hover {
+  color: #b91c1c;
+}

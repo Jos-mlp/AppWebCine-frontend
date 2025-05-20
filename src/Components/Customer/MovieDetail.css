@@ -1,0 +1,65 @@
+/* MovieDetail.css */
+.movie-detail-container {
+  display: flex;
+}
+
+.main-content-detail {
+  flex: 1;
+  padding: 20px;
+  background-color: #f9fafb;
+  min-height: 100vh;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #1e40af;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.detail-card {
+  display: flex;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.detail-card img {
+  width: 300px;
+  height: auto;
+  object-fit: cover;
+}
+
+.detail-info {
+  padding: 20px;
+  flex: 1;
+}
+
+.detail-info h2 {
+  margin-bottom: 12px;
+  color: #1e3a8a;
+}
+
+.detail-info p {
+  margin: 8px 0;
+  color: #4b5563;
+}
+
+.detail-info .reserve-button {
+  margin-top: 20px;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.detail-info .reserve-button:hover {
+  background-color: #1e40af;
+}

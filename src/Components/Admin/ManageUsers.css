@@ -1,0 +1,58 @@
+/* ManageUsers.css */
+.manage-users-container {
+  display: flex;
+}
+
+.manage-users-main {
+  flex: 1;
+  padding: 20px;
+  background-color: #f9fafb;
+  min-height: 100vh;
+}
+
+.manage-users-main h1 {
+  color: #1e3a8a;
+  margin-bottom: 20px;
+}
+
+.user-form {
+  background-color: #ffffff;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-form label {
+  margin-top: 8px;
+  color: #4b5563;
+}
+
+.user-form input {
+  margin-top: 4px;
+  padding: 6px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+}
+
+.user-form button {
+  margin-top: 16px;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.user-form button:hover {
+  background-color: #1e40af;
+}
+
+.user-form .mensaje {
+  margin-top: 12px;
+  color: #dc2626;
+}

@@ -1,0 +1,107 @@
+/* SeatBooking.css */
+:root {
+  --seat-size: 25px;
+}
+
+.seat-booking-container {
+  display: flex;
+}
+
+.main-content-seats {
+  flex: 1;
+  padding: 20px;
+  background-color: #f9fafb;
+  min-height: 100vh;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #1e40af;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+h2 {
+  color: #1e3a8a;
+  margin-bottom: 16px;
+}
+
+.fecha-selector {
+  margin-bottom: 20px;
+}
+
+.fecha-selector label {
+  margin-right: 8px;
+  color: #1e40af;
+}
+
+.fecha-selector select {
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+}
+
+.seats-grid-container {
+  margin-bottom: 20px;
+}
+
+.screen {
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.seats-grid {
+  gap: 8px;
+}
+
+.seat {
+  width: var(--seat-size);
+  height: var(--seat-size);
+  background-color: #d1d5db; /* gris claro: disponible */
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.seat.reserved {
+  background-color: #9ca3af; /* gris oscuro: reservado */
+  cursor: not-allowed;
+}
+
+.seat.selected {
+  background-color: #2563eb; /* azul primario: seleccionado */
+}
+
+.confirm-button {
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.confirm-button:hover {
+  background-color: #1e40af;
+}
+
+.mensaje {
+  margin-top: 12px;
+  color: #dc2626; /* rojo para errores */
+}
+
+.qr-container {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.qr-container img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+}

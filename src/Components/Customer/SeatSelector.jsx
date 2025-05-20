@@ -1,17 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import './SeatSelector.css';
 
-const SeatSelector = ({ rows = 10, cols = 15 }) => {
-  const [selected, setSelected] = useState(new Set());
-
-  const toggleSeat = (r, c) => {
-    const key = `${r}-${c}`;
-    const newSelected = new Set(selected);
-    if (newSelected.has(key)) newSelected.delete(key);
-    else newSelected.add(key);
-    setSelected(newSelected);
-  };
-
+const SeatSelector = ({ rows = 10, cols = 15, onToggle, estadoAsientos = [], seleccionados = new Set() }) => {
+  // Esta versión ya no se usa directamente porque SeatBooking maneja el render.
+  // La dejamos aquí por si la quieres reutilizar más tarde.
   return (
     <div className="seat-selector">
       <div className="screen">PANTALLA</div>
@@ -25,15 +17,15 @@ const SeatSelector = ({ rows = 10, cols = 15 }) => {
             return (
               <div
                 key={key}
-                className={`seat ${selected.has(key) ? 'selected' : ''}`}
-                onClick={() => toggleSeat(r, c)}
+                className={`seat ${seleccionados.has(key) ? 'selected' : ''}`}
+                onClick={() => onToggle(r, c)}
               />
             );
           })
         )}
       </div>
       <div className="counter">
-        Asientos seleccionados: {selected.size}
+        Asientos seleccionados: {seleccionados.size}
       </div>
     </div>
   );
