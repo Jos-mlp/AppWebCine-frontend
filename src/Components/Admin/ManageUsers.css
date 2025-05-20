@@ -1,13 +1,21 @@
 /* ManageUsers.css */
 .manage-users-container {
   display: flex;
+  justify-content: center;
 }
 
 .manage-users-main {
   flex: 1;
+  max-width: 400px;
+  margin: 0 auto;
   padding: 20px;
   background-color: #f9fafb;
   min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .manage-users-main h1 {
@@ -20,7 +28,7 @@
   padding: 20px;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  max-width: 300px;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -28,6 +36,7 @@
 .user-form label {
   margin-top: 8px;
   color: #4b5563;
+  text-align: left;
 }
 
 .user-form input {

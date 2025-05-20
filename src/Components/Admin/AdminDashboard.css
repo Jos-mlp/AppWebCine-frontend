@@ -1,13 +1,21 @@
 /* AdminDashboard.css */
 .admin-container {
   display: flex;
+  justify-content: center; /* Centra horizontalmente */
 }
 
 .admin-main {
   flex: 1;
+  max-width: 800px; /* Limita ancho máximo */
+  margin: 0 auto;   /* Centra dentro del container */
   padding: 20px;
   background-color: #f9fafb;
   min-height: 100vh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra contenido hijo */
+  text-align: center;
 }
 
 .admin-main h1 {
@@ -18,6 +26,8 @@
 .admin-buttons {
   display: flex;
   gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .admin-buttons button {

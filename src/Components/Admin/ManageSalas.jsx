@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import './ManageSalas.css';
@@ -10,6 +10,14 @@ const ManageSalas = () => {
   const [salas, setSalas] = useState([]);
   const [formData, setFormData] = useState({ numero_sala: '', filas: '', columnas: '' });
   const [mensaje, setMensaje] = useState('');
+
+  // Estados para modales
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingSala, setEditingSala] = useState(null);
+  const [editData, setEditData] = useState({ numero_sala: '', filas: '', columnas: '' });
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingSala, setDeletingSala] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -65,41 +73,34 @@ const ManageSalas = () => {
     }
   };
 
-  const handleDelete = async (id, numero_sala) => {
-    const confirmDelete = window.confirm(
-      `¿Seguro que quieres eliminar la sala "${numero_sala}" (ID: ${id})?`
-    );
-    if (!confirmDelete) return;
-    try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:3000/salas/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setSalas(salas.filter((s) => s.id_sala !== id));
-      setMensaje('Sala eliminada correctamente');
-    } catch (err) {
-      console.error('Error al eliminar sala:', err.response?.data || err.message);
-      setMensaje(err.response?.data?.error || 'Error al eliminar sala');
-    }
+  // Abrir modal de edición y precargar datos
+  const openEditModal = (sala) => {
+    setEditingSala(sala);
+    setEditData({
+      numero_sala: sala.numero_sala,
+      filas: sala.filas.toString(),
+      columnas: sala.columnas.toString()
+    });
+    setShowEditModal(true);
   };
 
-  const handleEdit = async (sala) => {
-    // Pedir nuevos valores
-    const nuevoNumero = window.prompt('Nuevo número de sala:', sala.numero_sala);
-    if (nuevoNumero === null) return;
-    const nuevasFilas = window.prompt('Nuevas filas:', sala.filas);
-    if (nuevasFilas === null) return;
-    const nuevasColumnas = window.prompt('Nuevas columnas:', sala.columnas);
-    if (nuevasColumnas === null) return;
+  const handleEditChange = (e) => {
+    setEditData({ ...editData, [e.target.id]: e.target.value });
+  };
 
+  const handleEditSubmit = async () => {
+    if (!editData.numero_sala || !editData.filas || !editData.columnas) {
+      setMensaje('Completa todos los campos de edición');
+      return;
+    }
     try {
       const token = localStorage.getItem('token');
       const body = {
-        filas: parseInt(nuevasFilas),
-        columnas: parseInt(nuevasColumnas)
-        // Modificar numero_sala no está en el endpoint PUT; si lo quieres, necesitarás ajustar backend
+        filas: parseInt(editData.filas),
+        columnas: parseInt(editData.columnas)
+        // Si necesitas permitir editar numero_sala, agrégalo en el endpoint PUT backend y aquí
       };
-      await axios.put(`http://localhost:3000/salas/${sala.id_sala}`, body, {
+      await axios.put(`http://localhost:3000/salas/${editingSala.id_sala}`, body, {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Refrescar lista
@@ -112,6 +113,30 @@ const ManageSalas = () => {
       console.error('Error al actualizar sala:', err.response?.data || err.message);
       setMensaje(err.response?.data?.error || 'Error al actualizar sala');
     }
+    setShowEditModal(false);
+    setEditingSala(null);
+  };
+
+  // Abrir modal de confirmación de borrado
+  const openDeleteModal = (sala) => {
+    setDeletingSala(sala);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:3000/salas/${deletingSala.id_sala}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSalas(salas.filter((s) => s.id_sala !== deletingSala.id_sala));
+      setMensaje('Sala eliminada correctamente');
+    } catch (err) {
+      console.error('Error al eliminar sala:', err.response?.data || err.message);
+      setMensaje(err.response?.data?.error || 'Error al eliminar sala');
+    }
+    setShowDeleteModal(false);
+    setDeletingSala(null);
   };
 
   return (
@@ -168,11 +193,11 @@ const ManageSalas = () => {
                     <td className="acciones-col">
                       <FaEdit
                         className="icon edit-icon"
-                        onClick={() => handleEdit(s)}
+                        onClick={() => openEditModal(s)}
                       />
                       <FaTrash
                         className="icon delete-icon"
-                        onClick={() => handleDelete(s.id_sala, s.numero_sala)}
+                        onClick={() => openDeleteModal(s)}
                       />
                     </td>
                   </tr>
@@ -183,6 +208,81 @@ const ManageSalas = () => {
         </div>
       </main>
       <Sidebar />
+
+      {/* Modal de Edición */}
+      {showEditModal && (
+        <>
+          <div
+            className="modal-overlay"
+            onClick={() => {
+              setShowEditModal(false);
+              setEditingSala(null);
+            }}
+          />
+          <div className="modal-content">
+            <h3>Editar Sala (ID: {editingSala.id_sala})</h3>
+            <label htmlFor="numero_sala_edit">Número de sala:</label>
+            <input
+              type="text"
+              id="numero_sala_edit"
+              value={editData.numero_sala}
+              onChange={(e) => setEditData({ ...editData, numero_sala: e.target.value })}
+            />
+            <label htmlFor="filas_edit">Filas:</label>
+            <input
+              type="number"
+              id="filas_edit"
+              value={editData.filas}
+              onChange={(e) => setEditData({ ...editData, filas: e.target.value })}
+            />
+            <label htmlFor="columnas_edit">Columnas:</label>
+            <input
+              type="number"
+              id="columnas_edit"
+              value={editData.columnas}
+              onChange={(e) => setEditData({ ...editData, columnas: e.target.value })}
+            />
+            <button onClick={handleEditSubmit}>Guardar cambios</button>
+            <button
+              className="cancel-button"
+              onClick={() => {
+                setShowEditModal(false);
+                setEditingSala(null);
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Modal de Confirmación de Borrado */}
+      {showDeleteModal && (
+        <>
+          <div
+            className="modal-overlay"
+            onClick={() => {
+              setShowDeleteModal(false);
+              setDeletingSala(null);
+            }}
+          />
+          <div className="modal-content">
+            <h3>
+              ¿Eliminar sala "{deletingSala.numero_sala}" (ID: {deletingSala.id_sala})?
+            </h3>
+            <button onClick={handleDeleteConfirm}>Sí, eliminar</button>
+            <button
+              className="cancel-button"
+              onClick={() => {
+                setShowDeleteModal(false);
+                setDeletingSala(null);
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

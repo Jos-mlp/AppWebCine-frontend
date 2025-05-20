@@ -18,6 +18,20 @@ const ManageFunciones = () => {
   });
   const [mensaje, setMensaje] = useState('');
 
+  // Modales
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingFuncion, setEditingFuncion] = useState(null);
+  const [editData, setEditData] = useState({
+    pelicula_nombre: '',
+    pelicula_descripcion: '',
+    poster_pelicula: '',
+    fecha: '',
+    id_sala: ''
+  });
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingFuncion, setDeletingFuncion] = useState(null);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const payload = token ? JSON.parse(atob(token.split('.')[1])) : null;
@@ -80,49 +94,39 @@ const ManageFunciones = () => {
     }
   };
 
-  const handleDelete = async (id, titulo) => {
-    const confirmDelete = window.confirm(
-      `¿Seguro que quieres eliminar la función "${titulo}" (ID: ${id})?`
-    );
-    if (!confirmDelete) return;
-    try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:3000/funciones/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setFunciones(funciones.filter((f) => f.id_funcion_pelicula !== id));
-      setMensaje('Función eliminada correctamente');
-    } catch (err) {
-      console.error('Error al eliminar función:', err.response?.data || err.message);
-      setMensaje(err.response?.data?.error || 'Error al eliminar función');
-    }
+  // Abrir modal de edición y precargar datos de la función
+  const openEditModal = (funcion) => {
+    setEditingFuncion(funcion);
+    setEditData({
+      pelicula_nombre: funcion.pelicula_nombre,
+      pelicula_descripcion: funcion.pelicula_descripcion,
+      poster_pelicula: funcion.poster_pelicula || '',
+      fecha: funcion.fecha,
+      id_sala: funcion.id_sala.toString()
+    });
+    setShowEditModal(true);
   };
 
-  const handleEdit = async (funcion) => {
-    const nuevoTitulo = window.prompt('Nuevo título:', funcion.pelicula_nombre);
-    if (nuevoTitulo === null) return;
-    const nuevaDescripcion = window.prompt(
-      'Nueva descripción:',
-      funcion.pelicula_descripcion
-    );
-    if (nuevaDescripcion === null) return;
-    const nuevoPoster = window.prompt('Nueva URL póster:', funcion.poster_pelicula);
-    if (nuevoPoster === null) return;
-    const nuevaFecha = window.prompt('Nueva fecha (YYYY-MM-DD):', funcion.fecha);
-    if (nuevaFecha === null) return;
-    const nuevaSala = window.prompt('Nuevo ID de sala:', funcion.id_sala);
-    if (nuevaSala === null) return;
+  const handleEditChange = (e) => {
+    setEditData({ ...editData, [e.target.id]: e.target.value });
+  };
 
+  const handleEditSubmit = async () => {
+    const { pelicula_nombre, pelicula_descripcion, poster_pelicula, fecha, id_sala } = editData;
+    if (!pelicula_nombre || !pelicula_descripcion || !fecha || !id_sala) {
+      setMensaje('Completa todos los campos de edición');
+      return;
+    }
     try {
       const token = localStorage.getItem('token');
       const body = {
-        pelicula_nombre: nuevoTitulo,
-        pelicula_descripcion: nuevaDescripcion,
-        poster_pelicula: nuevoPoster,
-        // `fecha` y `id_sala` no están en el PUT original:  
-        // si tu endpoint PUT acepta modificarlos, inclúyelos aquí
+        pelicula_nombre,
+        pelicula_descripcion,
+        poster_pelicula,
+        fecha,
+        id_sala: parseInt(id_sala)
       };
-      await axios.put(`http://localhost:3000/funciones/${funcion.id_funcion_pelicula}`, body, {
+      await axios.put(`http://localhost:3000/funciones/${editingFuncion.id_funcion_pelicula}`, body, {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Refrescar lista
@@ -135,6 +139,30 @@ const ManageFunciones = () => {
       console.error('Error al actualizar función:', err.response?.data || err.message);
       setMensaje(err.response?.data?.error || 'Error al actualizar función');
     }
+    setShowEditModal(false);
+    setEditingFuncion(null);
+  };
+
+  // Abrir modal de confirmación de borrado
+  const openDeleteModal = (funcion) => {
+    setDeletingFuncion(funcion);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:3000/funciones/${deletingFuncion.id_funcion_pelicula}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setFunciones(funciones.filter((f) => f.id_funcion_pelicula !== deletingFuncion.id_funcion_pelicula));
+      setMensaje('Función eliminada correctamente');
+    } catch (err) {
+      console.error('Error al eliminar función:', err.response?.data || err.message);
+      setMensaje(err.response?.data?.error || 'Error al eliminar función');
+    }
+    setShowDeleteModal(false);
+    setDeletingFuncion(null);
   };
 
   return (
@@ -216,13 +244,11 @@ const ManageFunciones = () => {
                     <td className="acciones-col">
                       <FaEdit
                         className="icon edit-icon"
-                        onClick={() => handleEdit(f)}
+                        onClick={() => openEditModal(f)}
                       />
                       <FaTrash
                         className="icon delete-icon"
-                        onClick={() =>
-                          handleDelete(f.id_funcion_pelicula, f.pelicula_nombre)
-                        }
+                        onClick={() => openDeleteModal(f)}
                       />
                     </td>
                   </tr>
@@ -233,6 +259,106 @@ const ManageFunciones = () => {
         </div>
       </main>
       <Sidebar />
+
+      {/* Modal de Edición de Función */}
+      {showEditModal && (
+        <>
+          <div
+            className="modal-overlay"
+            onClick={() => {
+              setShowEditModal(false);
+              setEditingFuncion(null);
+            }}
+          />
+          <div className="modal-content">
+            <h3>Editar Función (ID: {editingFuncion.id_funcion_pelicula})</h3>
+
+            <label htmlFor="pelicula_nombre_edit">Título:</label>
+            <input
+              type="text"
+              id="pelicula_nombre"
+              value={editData.pelicula_nombre}
+              onChange={(e) => setEditData({ ...editData, pelicula_nombre: e.target.value })}
+            />
+
+            <label htmlFor="pelicula_descripcion_edit">Descripción:</label>
+            <textarea
+              id="pelicula_descripcion"
+              value={editData.pelicula_descripcion}
+              onChange={(e) => setEditData({ ...editData, pelicula_descripcion: e.target.value })}
+            />
+
+            <label htmlFor="poster_pelicula_edit">URL de póster:</label>
+            <input
+              type="text"
+              id="poster_pelicula"
+              value={editData.poster_pelicula}
+              onChange={(e) => setEditData({ ...editData, poster_pelicula: e.target.value })}
+            />
+
+            <label htmlFor="fecha_edit">Fecha (YYYY-MM-DD):</label>
+            <input
+              type="date"
+              id="fecha"
+              value={editData.fecha}
+              onChange={(e) => setEditData({ ...editData, fecha: e.target.value })}
+            />
+
+            <label htmlFor="id_sala_edit">Sala:</label>
+            <select
+              id="id_sala"
+              value={editData.id_sala}
+              onChange={(e) => setEditData({ ...editData, id_sala: e.target.value })}
+            >
+              <option value="">Selecciona una sala</option>
+              {salas.map((s) => (
+                <option key={s.id_sala} value={s.id_sala}>
+                  {s.numero_sala}
+                </option>
+              ))}
+            </select>
+
+            <button onClick={handleEditSubmit}>Guardar cambios</button>
+            <button
+              className="cancel-button"
+              onClick={() => {
+                setShowEditModal(false);
+                setEditingFuncion(null);
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </>
+      )}
+
+      {/* Modal de Confirmación de Borrado de Función */}
+      {showDeleteModal && (
+        <>
+          <div
+            className="modal-overlay"
+            onClick={() => {
+              setShowDeleteModal(false);
+              setDeletingFuncion(null);
+            }}
+          />
+          <div className="modal-content">
+            <h3>
+              ¿Eliminar función "{deletingFuncion.pelicula_nombre}" (ID: {deletingFuncion.id_funcion_pelicula})?
+            </h3>
+            <button onClick={handleDeleteConfirm}>Sí, eliminar</button>
+            <button
+              className="cancel-button"
+              onClick={() => {
+                setShowDeleteModal(false);
+                setDeletingFuncion(null);
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
