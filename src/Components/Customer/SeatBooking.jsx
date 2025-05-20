@@ -79,21 +79,19 @@ const SeatBooking = () => {
     if (fechaSeleccionada) fetchAsientos();
   }, [fechaSeleccionada, navigate, pelicula]);
 
-  // Función para convertir número de fila a letra (1->A, 2->B, ...)
+  // Convertir fila numérica a letra
   const filaALetra = (filaNum) => String.fromCharCode(64 + filaNum);
 
-  // Cambiar selección de asientos
+  // Seleccionar / deseleccionar asiento
   const toggleSeat = (id_asiento) => {
     const actual = asientosEstado.find((a) => a.id_asiento === id_asiento);
     if (!actual || actual.estado !== 'Disponible') return;
-
     const copia = new Set(asientosSeleccionados);
-    if (copia.has(id_asiento)) copia.delete(id_asiento);
-    else copia.add(id_asiento);
+    copia.has(id_asiento) ? copia.delete(id_asiento) : copia.add(id_asiento);
     setAsientosSeleccionados(copia);
   };
 
-  // Al hacer clic en “Reservar”, abrir modal de pago y arrancar timer
+  // Abrir modal de pago
   const handleReserveClick = () => {
     if (asientosSeleccionados.size === 0) {
       setMensaje('Selecciona al menos un asiento.');
@@ -102,7 +100,6 @@ const SeatBooking = () => {
     setShowPaymentModal(true);
     setShowSummary(false);
     setTimeLeft(300);
-    // Iniciar temporizador
     clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -118,12 +115,12 @@ const SeatBooking = () => {
     }, 1000);
   };
 
-  // Manejar cambios en el formulario de pago
+  // Actualizar estado de pago al escribir
   const handlePaymentChange = (e) => {
     setPaymentData({ ...paymentData, [e.target.id]: e.target.value });
   };
 
-  // Al confirmar compra en modal
+  // Confirmar pago y crear reserva
   const handleConfirmPayment = async () => {
     const { email, cardNumber, cardName, expiry, cvv } = paymentData;
     if (!email || !cardNumber || !cardName || !expiry || !cvv) {
@@ -162,7 +159,7 @@ const SeatBooking = () => {
     }
   };
 
-  // Formatear timeLeft a “MM:SS”
+  // Formatear el temporizador
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60).toString().padStart(2, '0');
     const s = (seconds % 60).toString().padStart(2, '0');
@@ -204,9 +201,8 @@ const SeatBooking = () => {
             >
               {asientosEstado.map((a) => {
                 let cls = 'seat';
-                if (a.estado === 'Reservado' || a.estado === 'Ocupado') cls += ' reserved';
+                if (['Reservado', 'Ocupado'].includes(a.estado)) cls += ' reserved';
                 else if (asientosSeleccionados.has(a.id_asiento)) cls += ' selected';
-
                 const label = `${filaALetra(a.fila)}${a.columna}`;
                 return (
                   <div
@@ -228,7 +224,7 @@ const SeatBooking = () => {
           )}
           {mensaje && <p className="mensaje">{mensaje}</p>}
 
-          {/* Mostrar resumen final con QR */}
+          {/* Resumen final con QR */}
           {showSummary && (
             <div className="qr-container">
               <h3>Reserva Confirmada</h3>
@@ -257,6 +253,7 @@ const SeatBooking = () => {
               <div className="modal-content">
                 <h3>Datos de Pago</h3>
                 <p className="timer">Tiempo restante: {formatTime(timeLeft)}</p>
+
                 <label htmlFor="email">Correo electrónico:</label>
                 <input
                   type="email"
@@ -265,6 +262,7 @@ const SeatBooking = () => {
                   value={paymentData.email}
                   onChange={handlePaymentChange}
                 />
+
                 <label htmlFor="cardNumber">Número de tarjeta:</label>
                 <input
                   type="text"
@@ -273,6 +271,7 @@ const SeatBooking = () => {
                   value={paymentData.cardNumber}
                   onChange={handlePaymentChange}
                 />
+
                 <label htmlFor="cardName">Nombre en la tarjeta:</label>
                 <input
                   type="text"
@@ -281,15 +280,20 @@ const SeatBooking = () => {
                   value={paymentData.cardName}
                   onChange={handlePaymentChange}
                 />
+
                 <label htmlFor="expiry">Fecha de vencimiento:</label>
                 <input
                   type="text"
+                  id="expiry"
                   placeholder="MM/YY"
                   maxLength="5"
                   pattern="^(0[1-9]|1[0-2])\/\d{2}$"
                   title="Formato MM/YY"
                   required
+                  value={paymentData.expiry}
+                  onChange={handlePaymentChange}
                 />
+
                 <label htmlFor="cvv">CVV:</label>
                 <input
                   type="password"
@@ -299,6 +303,7 @@ const SeatBooking = () => {
                   value={paymentData.cvv}
                   onChange={handlePaymentChange}
                 />
+
                 <button onClick={handleConfirmPayment}>Confirmar compra</button>
               </div>
             </>
