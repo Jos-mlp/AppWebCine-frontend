@@ -16,6 +16,8 @@ const SeatBooking = () => {
   const [asientosSeleccionados, setAsientosSeleccionados] = useState(new Set());
   const [qrCodeUrl, setQrCodeUrl] = useState(null);
   const [mensaje, setMensaje] = useState('');
+
+  // Modal de pago
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentData, setPaymentData] = useState({
     email: '',
@@ -24,9 +26,14 @@ const SeatBooking = () => {
     expiry: '',
     cvv: ''
   });
+
+  // Temporizador en segundos (5 minutos = 300 segundos)
+  const [timeLeft, setTimeLeft] = useState(300);
+  const timerRef = useRef(null);
+
+  // Estado de resumen final
   const [showSummary, setShowSummary] = useState(false);
   const [summaryData, setSummaryData] = useState({});
-  const holdTimerRef = useRef(null);
 
   // Generar próximas 8 fechas
   useEffect(() => {
@@ -63,7 +70,8 @@ const SeatBooking = () => {
         setAsientosEstado(response.data);
         setAsientosSeleccionados(new Set());
         setQrCodeUrl(null);
-        clearTimeout(holdTimerRef.current);
+        clearInterval(timerRef.current);
+        setTimeLeft(300);
       } catch (err) {
         console.error('Error al obtener asientos:', err.response?.data || err.message);
       }
@@ -72,9 +80,7 @@ const SeatBooking = () => {
   }, [fechaSeleccionada, navigate, pelicula]);
 
   // Función para convertir número de fila a letra (1->A, 2->B, ...)
-  const filaALetra = (filaNum) => {
-    return String.fromCharCode(64 + filaNum); // 65 = 'A'
-  };
+  const filaALetra = (filaNum) => String.fromCharCode(64 + filaNum);
 
   // Cambiar selección de asientos
   const toggleSeat = (id_asiento) => {
@@ -87,20 +93,29 @@ const SeatBooking = () => {
     setAsientosSeleccionados(copia);
   };
 
-  // Al dar “Reservar”, abrimos modal de pago y “retenemos” temporalmente los asientos
+  // Al hacer clic en “Reservar”, abrir modal de pago y arrancar timer
   const handleReserveClick = () => {
     if (asientosSeleccionados.size === 0) {
       setMensaje('Selecciona al menos un asiento.');
       return;
     }
     setShowPaymentModal(true);
-    // Iniciar “retención” de 5 minutos: si no se confirma la compra, liberamos los seleccionados
-    clearTimeout(holdTimerRef.current);
-    holdTimerRef.current = setTimeout(() => {
-      setMensaje('Tiempo de reserva expirado. Se han liberado los asientos.');
-      setAsientosSeleccionados(new Set());
-      setShowPaymentModal(false);
-    }, 5 * 60 * 1000); // 5 minutos
+    setShowSummary(false);
+    setTimeLeft(300);
+    // Iniciar temporizador
+    clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          setShowPaymentModal(false);
+          setMensaje('Tiempo expirado. Se liberan los asientos.');
+          setAsientosSeleccionados(new Set());
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   // Manejar cambios en el formulario de pago
@@ -110,7 +125,6 @@ const SeatBooking = () => {
 
   // Al confirmar compra en modal
   const handleConfirmPayment = async () => {
-    // Validación básica de campos
     const { email, cardNumber, cardName, expiry, cvv } = paymentData;
     if (!email || !cardNumber || !cardName || !expiry || !cvv) {
       setMensaje('Completa todos los datos de pago.');
@@ -139,7 +153,7 @@ const SeatBooking = () => {
         })
       });
       setShowSummary(true);
-      clearTimeout(holdTimerRef.current);
+      clearInterval(timerRef.current);
       setShowPaymentModal(false);
       setMensaje('');
     } catch (err) {
@@ -148,127 +162,148 @@ const SeatBooking = () => {
     }
   };
 
+  // Formatear timeLeft a “MM:SS”
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
   return (
     <div className="seat-booking-container">
       <main className="main-content-seats">
-        <button className="back-button" onClick={() => navigate('/dashboard')}>
-          ← Volver a Cartelera
-        </button>
-        <h2>Reservar asientos: {pelicula?.pelicula_nombre}</h2>
-
-        <div className="fecha-selector">
-          <label>Elige fecha:</label>
-          <select
-            value={fechaSeleccionada}
-            onChange={(e) => setFechaSeleccionada(e.target.value)}
-          >
-            {proximasFechas.map((f) => (
-              <option key={f} value={f}>
-                {dayjs(f).format('DD/MM/YYYY')}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="seats-grid-container">
-          <div className="screen">PANTALLA</div>
-          <div
-            className="seats-grid"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: `repeat(${Math.max(
-                ...asientosEstado.map((a) => a.columna)
-              )}, var(--seat-size))`
-            }}
-          >
-            {asientosEstado.map((a) => {
-              let cls = 'seat';
-              if (a.estado === 'Reservado' || a.estado === 'Ocupado') cls += ' reserved';
-              else if (asientosSeleccionados.has(a.id_asiento)) cls += ' selected';
-              const label = `${filaALetra(a.fila)}${a.columna}`;
-              return (
-                <div
-                  key={a.id_asiento}
-                  className={cls}
-                  onClick={() => toggleSeat(a.id_asiento)}
-                >
-                  <span className="label">{label}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {!showSummary && (
-          <button className="confirm-button" onClick={handleReserveClick}>
-            Reservar
+        <div className="seat-booking-inner">
+          <button className="back-button" onClick={() => navigate('/dashboard')}>
+            ← Volver a Cartelera
           </button>
-        )}
-        {mensaje && <p className="mensaje">{mensaje}</p>}
+          <h2>Reservar asientos: {pelicula?.pelicula_nombre}</h2>
 
-        {/* Mostrar resumen final con QR */}
-        {showSummary && (
-          <div className="qr-container">
-            <h3>Reserva Confirmada</h3>
-            <p><strong>ID Reserva:</strong> {summaryData.reservaId}</p>
-            <p><strong>Película:</strong> {summaryData.pelicula}</p>
-            <p><strong>Fecha:</strong> {dayjs(summaryData.fecha).format('DD/MM/YYYY')}</p>
-            <p><strong>Asientos:</strong> {summaryData.asientos.join(', ')}</p>
-            <img src={qrCodeUrl} alt="QR de reserva" />
-            <p>Haz clic derecho sobre el QR y “Guardar imagen”.</p>
+          <div className="fecha-selector">
+            <label>Elige fecha:</label>
+            <select
+              value={fechaSeleccionada}
+              onChange={(e) => setFechaSeleccionada(e.target.value)}
+            >
+              {proximasFechas.map((f) => (
+                <option key={f} value={f}>
+                  {dayjs(f).format('DD/MM/YYYY')}
+                </option>
+              ))}
+            </select>
           </div>
-        )}
 
-        {/* Modal de pago */}
-        {showPaymentModal && (
-          <>
-            <div className="modal-overlay" onClick={() => setShowPaymentModal(false)} />
-            <div className="modal-content">
-              <h3>Datos de Pago</h3>
-              <label htmlFor="email">Correo electrónico:</label>
-              <input
-                type="email"
-                id="email"
-                placeholder="correo@ejemplo.com"
-                value={paymentData.email}
-                onChange={handlePaymentChange}
-              />
-              <label htmlFor="cardNumber">Número de tarjeta:</label>
-              <input
-                type="text"
-                id="cardNumber"
-                placeholder="1234 5678 9012 3456"
-                value={paymentData.cardNumber}
-                onChange={handlePaymentChange}
-              />
-              <label htmlFor="cardName">Nombre en la tarjeta:</label>
-              <input
-                type="text"
-                id="cardName"
-                placeholder="Juan Pérez"
-                value={paymentData.cardName}
-                onChange={handlePaymentChange}
-              />
-              <label htmlFor="expiry">Fecha de vencimiento:</label>
-              <input
-                type="month"
-                id="expiry"
-                value={paymentData.expiry}
-                onChange={handlePaymentChange}
-              />
-              <label htmlFor="cvv">CVV:</label>
-              <input
-                type="password"
-                id="cvv"
-                placeholder="123"
-                maxLength="4"
-                value={paymentData.cvv}
-                onChange={handlePaymentChange}
-              />
-              <button onClick={handleConfirmPayment}>Confirmar compra</button>
+          <div className="seats-grid-container">
+            <div className="screen">PANTALLA</div>
+            <div
+              className="seats-grid"
+              style={{
+                gridTemplateColumns: `repeat(${Math.max(
+                  ...asientosEstado.map((a) => a.columna)
+                )}, var(--seat-size))`
+              }}
+            >
+              {asientosEstado.map((a) => {
+                let cls = 'seat';
+                if (a.estado === 'Reservado' || a.estado === 'Ocupado') cls += ' reserved';
+                else if (asientosSeleccionados.has(a.id_asiento)) cls += ' selected';
+
+                const label = `${filaALetra(a.fila)}${a.columna}`;
+                return (
+                  <div
+                    key={a.id_asiento}
+                    className={cls}
+                    onClick={() => toggleSeat(a.id_asiento)}
+                  >
+                    <span className="label">{label}</span>
+                  </div>
+                );
+              })}
             </div>
-          </>
-        )}
+          </div>
+
+          {!showSummary && (
+            <button className="confirm-button" onClick={handleReserveClick}>
+              Reservar
+            </button>
+          )}
+          {mensaje && <p className="mensaje">{mensaje}</p>}
+
+          {/* Mostrar resumen final con QR */}
+          {showSummary && (
+            <div className="qr-container">
+              <h3>Reserva Confirmada</h3>
+              <p><strong>ID Reserva:</strong> {summaryData.reservaId}</p>
+              <p><strong>Película:</strong> {summaryData.pelicula}</p>
+              <p><strong>Fecha:</strong> {dayjs(summaryData.fecha).format('DD/MM/YYYY')}</p>
+              <p><strong>Asientos:</strong> {summaryData.asientos.join(', ')}</p>
+              <img src={qrCodeUrl} alt="QR de reserva" />
+              <p>Haz clic derecho sobre el QR y “Guardar imagen”.</p>
+            </div>
+          )}
+
+          {/* Modal de pago */}
+          {showPaymentModal && (
+            <>
+              <div
+                className="modal-overlay"
+                onClick={() => {
+                  setShowPaymentModal(false);
+                  clearInterval(timerRef.current);
+                  setTimeLeft(300);
+                  setAsientosSeleccionados(new Set());
+                  setMensaje('Se canceló el pago. Se liberan los asientos.');
+                }}
+              />
+              <div className="modal-content">
+                <h3>Datos de Pago</h3>
+                <p className="timer">Tiempo restante: {formatTime(timeLeft)}</p>
+                <label htmlFor="email">Correo electrónico:</label>
+                <input
+                  type="email"
+                  id="email"
+                  placeholder="correo@ejemplo.com"
+                  value={paymentData.email}
+                  onChange={handlePaymentChange}
+                />
+                <label htmlFor="cardNumber">Número de tarjeta:</label>
+                <input
+                  type="text"
+                  id="cardNumber"
+                  placeholder="1234 5678 9012 3456"
+                  value={paymentData.cardNumber}
+                  onChange={handlePaymentChange}
+                />
+                <label htmlFor="cardName">Nombre en la tarjeta:</label>
+                <input
+                  type="text"
+                  id="cardName"
+                  placeholder="Juan Pérez"
+                  value={paymentData.cardName}
+                  onChange={handlePaymentChange}
+                />
+                <label htmlFor="expiry">Fecha de vencimiento:</label>
+                <input
+                  type="text"
+                  placeholder="MM/YY"
+                  maxLength="5"
+                  pattern="^(0[1-9]|1[0-2])\/\d{2}$"
+                  title="Formato MM/YY"
+                  required
+                />
+                <label htmlFor="cvv">CVV:</label>
+                <input
+                  type="password"
+                  id="cvv"
+                  placeholder="123"
+                  maxLength="4"
+                  value={paymentData.cvv}
+                  onChange={handlePaymentChange}
+                />
+                <button onClick={handleConfirmPayment}>Confirmar compra</button>
+              </div>
+            </>
+          )}
+        </div>
       </main>
       <Sidebar />
     </div>

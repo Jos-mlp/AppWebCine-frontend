@@ -195,6 +195,15 @@ const ManageFunciones = () => {
               value={formData.poster_pelicula}
               onChange={handleChange}
             />
+            {/* Vista previa en tiempo real */}
+            {formData.poster_pelicula && (
+              <img
+                src={formData.poster_pelicula}
+                alt="Preview póster"
+                className="poster-preview"
+                onError={(e) => (e.target.style.display = 'none')}
+              />
+            )}
 
             <label htmlFor="fecha">Fecha (YYYY-MM-DD):</label>
             <input
@@ -273,7 +282,7 @@ const ManageFunciones = () => {
           <div className="modal-content">
             <h3>Editar Función (ID: {editingFuncion.id_funcion_pelicula})</h3>
 
-            <label htmlFor="pelicula_nombre_edit">Título:</label>
+            <label htmlFor="pelicula_nombre">Título:</label>
             <input
               type="text"
               id="pelicula_nombre"
@@ -281,22 +290,31 @@ const ManageFunciones = () => {
               onChange={(e) => setEditData({ ...editData, pelicula_nombre: e.target.value })}
             />
 
-            <label htmlFor="pelicula_descripcion_edit">Descripción:</label>
+            <label htmlFor="pelicula_descripcion">Descripción:</label>
             <textarea
               id="pelicula_descripcion"
               value={editData.pelicula_descripcion}
               onChange={(e) => setEditData({ ...editData, pelicula_descripcion: e.target.value })}
             />
 
-            <label htmlFor="poster_pelicula_edit">URL de póster:</label>
+            <label htmlFor="poster_pelicula">URL de póster:</label>
             <input
               type="text"
               id="poster_pelicula"
               value={editData.poster_pelicula}
               onChange={(e) => setEditData({ ...editData, poster_pelicula: e.target.value })}
             />
+            {/* Vista previa en el modal de edición */}
+            {editData.poster_pelicula && (
+              <img
+                src={editData.poster_pelicula}
+                alt="Preview póster"
+                className="poster-preview"
+                onError={(e) => (e.target.style.display = 'none')}
+              />
+            )}
 
-            <label htmlFor="fecha_edit">Fecha (YYYY-MM-DD):</label>
+            <label htmlFor="fecha">Fecha (YYYY-MM-DD):</label>
             <input
               type="date"
               id="fecha"
@@ -304,7 +322,7 @@ const ManageFunciones = () => {
               onChange={(e) => setEditData({ ...editData, fecha: e.target.value })}
             />
 
-            <label htmlFor="id_sala_edit">Sala:</label>
+            <label htmlFor="id_sala">Sala:</label>
             <select
               id="id_sala"
               value={editData.id_sala}
