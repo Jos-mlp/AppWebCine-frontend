@@ -17,6 +17,7 @@ import AdminDashboard from './Components/Admin/AdminDashboard';
 import ManageSalas from './Components/Admin/ManageSalas';
 import ManageFunciones from './Components/Admin/ManageFunciones';
 import ManageUsers from './Components/Admin/ManageUsers';
+import Report from './Components/Report/Report';
 
 import {
   createBrowserRouter,
@@ -51,6 +52,9 @@ const router = createBrowserRouter([
   {
     path: '/admin',
     element: <AdminDashboard />
+  }, {
+  path: '/admin/report',
+  element: <Report />
   },
   {
     path: '/admin/salas',

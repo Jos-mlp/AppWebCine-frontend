@@ -40,6 +40,7 @@ const Sidebar = () => {
       <nav>
         <button onClick={() => navigate('/dashboard')}>Películas</button>
         <button onClick={() => navigate('/reservas')}>Reservas</button>
+        {isAdmin && <button onClick={() => navigate('/admin/report')}>Reporte</button>}
         {isAdmin && <button onClick={() => navigate('/admin')}>Admin</button>}
         <button onClick={handleLogout}>Cerrar sesión</button>
       </nav>
